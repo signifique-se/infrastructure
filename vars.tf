@@ -2,6 +2,10 @@ variable "account_id" {
   default = "12333211333111"
 }
 
+variable "region" {
+  default = "us-east-1"
+}
+
 # variables for email 
 variable "zone_id" {
   default = "Z0NEXXXXXXXXXXXXX"

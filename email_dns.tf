@@ -39,8 +39,8 @@ resource "aws_route53_record" "ms-mx-records" {
   ttl     = "600"
 
   records = [
-    "10 inbound-smtp.eu-west-1.amazonses.com",
-    "10 inbound-smtp.eu-west-1.amazonaws.com",
+    "10 inbound-smtp.${var.region}.amazonses.com",
+    "10 inbound-smtp.${var.region}.amazonaws.com",
   ]
 }
 
