@@ -10,3 +10,7 @@ variable "zone_id" {
 variable "domain" {
   default = "example.com"
 }
+
+variable "github_org_name" {
+  default = "example-organization"
+}
