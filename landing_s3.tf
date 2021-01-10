@@ -23,6 +23,17 @@ POLICY
   }
 }
 
+resource "aws_s3_bucket" "landing_www" {
+  bucket = "${var.landing_bucket_name}-www"
+  acl    = "private"
+
+  force_destroy = true
+
+  website {
+    redirect_all_requests_to = "https://${var.domain}"
+  }
+}
+
 data "aws_canonical_user_id" "current_user" {}
 locals {
   awslogsdelivery_canonical_user_id = "c4c1ede66af53448b93c283ce9448c4ba468c9432aa01d700d3878632f77d2d0"
