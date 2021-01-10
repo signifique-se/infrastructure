@@ -22,3 +22,23 @@ POLICY
     error_document = "index.html"
   }
 }
+
+data "aws_canonical_user_id" "current_user" {}
+locals {
+  awslogsdelivery_canonical_user_id = "c4c1ede66af53448b93c283ce9448c4ba468c9432aa01d700d3878632f77d2d0"
+}
+
+resource "aws_s3_bucket" "web_logs" {
+  bucket = "${var.region}.${var.domain}.web-logs"
+
+  grant {
+    id          = data.aws_canonical_user_id.current_user.id
+    permissions = ["FULL_CONTROL"]
+    type        = "CanonicalUser"
+  }
+  grant {
+    id          = local.awslogsdelivery_canonical_user_id
+    permissions = ["FULL_CONTROL"]
+    type        = "CanonicalUser"
+  }
+}

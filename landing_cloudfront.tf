@@ -9,6 +9,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
   enabled             = true
+  price_class         = "PriceClass_100"
   is_ipv6_enabled     = true
   comment             = ""
   default_root_object = "index.html"
@@ -23,7 +24,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
   logging_config {
     include_cookies = false
-    bucket          = "${var.landing_bucket_name}.s3.amazonaws.com"
+    bucket          = "${aws_s3_bucket.web_logs.bucket}.s3.amazonaws.com"
     prefix          = "cloudfront_logs"
   }
 
