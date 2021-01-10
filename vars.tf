@@ -18,3 +18,8 @@ variable "domain" {
 variable "github_org_name" {
   default = "example-organization"
 }
+
+# variables for landing page
+variable "landing_bucket_name" {
+  default = "us-east-1.example.com"
+}
