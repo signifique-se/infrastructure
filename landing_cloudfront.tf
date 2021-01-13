@@ -1,12 +1,18 @@
 locals {
-  s3_origin_id         = "S3LandingOrigin"
+  s3_origin_web_id     = "S3WebsiteLandingOrigin"
   s3_origin_web_www_id = "S3WebsiteLandingWWWOrigin"
 }
 
 resource "aws_cloudfront_distribution" "s3_distribution" {
   origin {
-    domain_name = aws_s3_bucket.landing.bucket_regional_domain_name
-    origin_id   = local.s3_origin_id
+    domain_name = aws_s3_bucket.landing.website_endpoint
+    origin_id   = local.s3_origin_web_id
+    custom_origin_config {
+      http_port              = "80"
+      https_port             = "443"
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["TLSv1"]
+    }
   }
 
   enabled             = true
@@ -34,7 +40,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = local.s3_origin_id
+    target_origin_id = local.s3_origin_web_id
 
     forwarded_values {
       query_string = false
@@ -54,7 +60,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     path_pattern     = "/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    target_origin_id = local.s3_origin_id
+    target_origin_id = local.s3_origin_web_id
 
     forwarded_values {
       query_string = false
