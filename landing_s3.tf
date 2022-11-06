@@ -1,5 +1,16 @@
 resource "aws_s3_bucket" "landing" {
   bucket = var.landing_bucket_name
+
+  force_destroy = true
+}
+
+resource "aws_s3_bucket_acl" "landing_acl" {
+  bucket = aws_s3_bucket.landing.id
+  acl    = "public-read"
+}
+
+resource "aws_s3_bucket_policy" "landing_policy" {
+  bucket = aws_s3_bucket.landing.id
   policy = <<POLICY
 {
   "Version":"2012-10-17",
@@ -13,21 +24,6 @@ resource "aws_s3_bucket" "landing" {
   ]
 }
 POLICY
-
-  force_destroy = true
-
-  lifecycle {
-    ignore_changes = [
-      acl,
-      grant,
-      website
-    ]
-  }
-}
-
-resource "aws_s3_bucket_acl" "landing_acl" {
-  bucket = aws_s3_bucket.landing.id
-  acl    = "public-read"
 }
 
 resource "aws_s3_bucket_website_configuration" "landing_website" {
@@ -45,12 +41,6 @@ resource "aws_s3_bucket" "landing_www" {
   bucket = "${var.landing_bucket_name}-www"
 
   force_destroy = true
-  lifecycle {
-    ignore_changes = [
-      grant,
-      website
-    ]
-  }
 }
 
 resource "aws_s3_bucket_acl" "landing_www_acl" {
@@ -73,12 +63,6 @@ locals {
 
 resource "aws_s3_bucket" "web_logs" {
   bucket = "${var.region}.${var.domain}.web-logs"
-
-  lifecycle {
-    ignore_changes = [
-      grant
-    ]
-  }
 }
 
 resource "aws_s3_bucket_acl" "web_logs_acl" {
