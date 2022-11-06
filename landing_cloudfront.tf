@@ -5,7 +5,7 @@ locals {
 
 resource "aws_cloudfront_distribution" "s3_distribution" {
   origin {
-    domain_name = aws_s3_bucket.landing.website_endpoint
+    domain_name = aws_s3_bucket_website_configuration.landing_website.website_endpoint
     origin_id   = local.s3_origin_web_id
     custom_origin_config {
       http_port              = "80"
@@ -107,7 +107,7 @@ resource "aws_route53_record" "record_a" {
 
 resource "aws_cloudfront_distribution" "s3_www_distribution" {
   origin {
-    domain_name = aws_s3_bucket.landing_www.website_endpoint
+    domain_name = aws_s3_bucket_website_configuration.landing_www_website.website_endpoint
     origin_id   = local.s3_origin_web_www_id
     custom_origin_config {
       http_port              = "80"

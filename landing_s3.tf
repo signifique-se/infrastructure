@@ -1,6 +1,5 @@
 resource "aws_s3_bucket" "landing" {
   bucket = var.landing_bucket_name
-  acl    = "public-read"
   policy = <<POLICY
 {
   "Version":"2012-10-17",
@@ -17,20 +16,53 @@ POLICY
 
   force_destroy = true
 
-  website {
-    index_document = "index.html"
-    error_document = "index.html"
+  lifecycle {
+    ignore_changes = [
+      acl,
+      grant,
+      website
+    ]
+  }
+}
+
+resource "aws_s3_bucket_acl" "landing_acl" {
+  bucket = aws_s3_bucket.landing.id
+  acl    = "public-read"
+}
+
+resource "aws_s3_bucket_website_configuration" "landing_website" {
+  bucket = aws_s3_bucket.landing.id
+
+  index_document {
+    suffix = "index.html"
+  }
+  error_document {
+    key = "index.html"
   }
 }
 
 resource "aws_s3_bucket" "landing_www" {
   bucket = "${var.landing_bucket_name}-www"
-  acl    = "private"
 
   force_destroy = true
+  lifecycle {
+    ignore_changes = [
+      grant,
+      website
+    ]
+  }
+}
 
-  website {
-    redirect_all_requests_to = "https://${var.domain}"
+resource "aws_s3_bucket_acl" "landing_www_acl" {
+  bucket = aws_s3_bucket.landing_www.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_website_configuration" "landing_www_website" {
+  bucket = aws_s3_bucket.landing_www.id
+  redirect_all_requests_to {
+    host_name = "${var.domain}"
+    protocol  = "https"
   }
 }
 
@@ -42,14 +74,34 @@ locals {
 resource "aws_s3_bucket" "web_logs" {
   bucket = "${var.region}.${var.domain}.web-logs"
 
-  grant {
-    id          = data.aws_canonical_user_id.current_user.id
-    permissions = ["FULL_CONTROL"]
-    type        = "CanonicalUser"
+  lifecycle {
+    ignore_changes = [
+      grant
+    ]
   }
-  grant {
-    id          = local.awslogsdelivery_canonical_user_id
-    permissions = ["FULL_CONTROL"]
-    type        = "CanonicalUser"
+}
+
+resource "aws_s3_bucket_acl" "web_logs_acl" {
+  bucket = aws_s3_bucket.web_logs.id
+  access_control_policy {
+    grant {
+      grantee {
+        id   = data.aws_canonical_user_id.current_user.id
+        type = "CanonicalUser"
+      }
+      permission = "FULL_CONTROL"
+    }
+
+    grant {
+      grantee {
+        id   = local.awslogsdelivery_canonical_user_id
+        type = "CanonicalUser"
+      }
+      permission = "FULL_CONTROL"
+    }
+
+    owner {
+      id = data.aws_canonical_user_id.current_user.id
+    }
   }
 }
